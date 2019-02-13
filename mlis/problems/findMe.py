@@ -9,6 +9,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 from ..utils import solutionmanager as sm
+from ..utils.gridsearch import GridSearch
 
 class SolutionModel(nn.Module):
     def __init__(self, input_size, output_size):
