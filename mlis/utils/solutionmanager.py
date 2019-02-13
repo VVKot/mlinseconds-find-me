@@ -209,10 +209,11 @@ class SolutionManager():
 
         return r
 
-    def run(self, case_number):
-        speed_calculator = speedtest.SpeedCalculator()
-        time_mult = speed_calculator.calc_linear_time_mult()
-        print("Local CPU time mult = {:.2f}".format(time_mult))
+    def run(self, case_number, run_benchmark=False):
+        if run_benchmark:
+            speed_calculator = speedtest.SpeedCalculator()
+            time_mult = speed_calculator.calc_linear_time_mult()
+            print("Local CPU time mult = {:.2f}".format(time_mult))
         data_provider = self.config.get_data_provider()
         if case_number == -1:
             casses = [i+1 for i in range(data_provider.number_of_cases)]
