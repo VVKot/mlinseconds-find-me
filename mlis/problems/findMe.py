@@ -24,12 +24,12 @@ class SolutionModel(nn.Module):
         self.batch_norms = nn.ModuleList([nn.BatchNorm1d(self.hidden_size if i != self.solution.layers_number-1 else self.output_size, track_running_stats=False) for i in range(self.solution.layers_number)])
 
     def forward(self, x):
-        x = self.linear1(x)
-        x = F.relu(x)
-        x = self.linear2(x)
-        x = F.relu(x)
-        x = self.linear3(x)
-        x = torch.sigmoid(x)
+        for i in range(len(self.linears)):
+            x = self.linears[i](x)
+            act_function = self.solution.activation_output if i == len(self.linears)-1 else self.solution.activation_hidden
+            x = self.solution.activations[act_function](x)
+            if self.solution.do_batch_norm:
+                x = self.batch_norms[i](x)
         return x
 
     def calc_loss(self, output, target):
@@ -80,7 +80,7 @@ class Solution():
         step = 0
         # Put model in train mode
         model.train()
-        optimizer = optim.SGD(model.parameters(), lr=1)
+        optimizer = optim.SGD(model.parameters(), lr=self.learning_rate, momentum=self.momentum)
         while True:
             time_left = context.get_timer().get_time_left()
             # No more time left, stop training
