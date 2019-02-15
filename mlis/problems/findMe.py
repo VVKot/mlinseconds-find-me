@@ -43,7 +43,7 @@ class SolutionModel(nn.Module):
 
 class Solution():
     def __init__(self):
-                self.best_step = 1000
+        self.best_step = 1000
         self.activations = {
             'sigmoid': nn.Sigmoid(),
             'relu': nn.ReLU(),
