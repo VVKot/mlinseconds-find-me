@@ -26,10 +26,10 @@ class SolutionModel(nn.Module):
     def forward(self, x):
         for i in range(len(self.linears)):
             x = self.linears[i](x)
-            act_function = self.solution.activation_output if i == len(self.linears)-1 else self.solution.activation_hidden
-            x = self.solution.activations[act_function](x)
             if self.solution.do_batch_norm:
                 x = self.batch_norms[i](x)
+            act_function = self.solution.activation_output if i == len(self.linears)-1 else self.solution.activation_hidden
+            x = self.solution.activations[act_function](x)
         return x
 
     def calc_loss(self, output, target):
@@ -67,10 +67,10 @@ class Solution():
         self.hidden_size_grid = [10, 20, 30, 40, 50]
         self.momentum_grid = [0.0, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
         self.learning_rate_grid = [0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01]
-        self.activation_hidden_grid = self.activations.keys()
-        self.activation_output_grid = self.activations.keys()
+        self.activation_hidden_grid = list(self.activations.keys())
+        # self.activation_output_grid = list(self.activations.keys())
         self.grid_search = GridSearch(self)
-        self.grid_search.set_enabled(False)
+        self.grid_search.set_enabled(True)
 
     def create_model(self, input_size, output_size):
         return SolutionModel(input_size, output_size, self)
