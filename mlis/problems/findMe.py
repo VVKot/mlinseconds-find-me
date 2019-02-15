@@ -50,12 +50,12 @@ class Solution():
         step = 0
         # Put model in train mode
         model.train()
+        optimizer = optim.SGD(model.parameters(), lr=1)
         while True:
             time_left = context.get_timer().get_time_left()
             # No more time left, stop training
             if time_left < 0.1:
                 break
-            optimizer = optim.SGD(model.parameters(), lr=1)
             data = train_data
             target = train_target
             # model.parameters()...gradient set to zero
