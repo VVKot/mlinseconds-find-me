@@ -8,8 +8,8 @@ import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from ..utils import solutionmanager as sm
-from ..utils.gridsearch import GridSearch
+import solutionmanager as sm
+from gridsearch import GridSearch
 
 class SolutionModel(nn.Module):
     def __init__(self, input_size, output_size, solution):
@@ -17,6 +17,13 @@ class SolutionModel(nn.Module):
         self.input_size = input_size
         self.output_size = output_size
         self.solution = solution
+        self.learning_rate = solution.learning_rate
+        self.momentum = solution.momentum
+        self.hidden_size = solution.hidden_size
+        self.activation_hidden = solution.activation_hidden
+        self.activation_output = solution.activation_output
+        self.do_batch_norm = solution.do_batch_norm
+        self.layers_number = solution.layers_number
         if self.solution.grid_search.enabled:
             torch.manual_seed(solution.random)
         self.hidden_size = self.solution.hidden_size
@@ -125,7 +132,7 @@ class Solution():
         return step
     
     def print_stats(self, step, loss, correct, total, model):
-        print("LR={}, Momentum={}, HS={}, Number of layers={}, ActivOut={}, Step = {} Prediction = {}/{} Error = {}".format(model.learning_rate, model.momentum,
+        print("LR={}, Momentum={}, HS={}, Number of layers={}, ActivOut={}, Step = {} Prediction = {}/{} Error = {}".format(model.solution.learning_rate, model.solution.momentum,
                                                                                                               model.hidden_size, model.activation_hidden, model.layers_number, step, correct, total, loss.item()))
 
       
