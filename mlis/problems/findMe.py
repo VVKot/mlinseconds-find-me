@@ -65,8 +65,8 @@ class Solution():
         self.random_grid = [_ for _ in range(10)]
         self.layers_number_grid = [3, 4, 5, 6, 7, 8, 9, 10]
         self.hidden_size_grid = [10, 20, 30, 40, 50]
-        self.momentum_grid = [0.0, 0.3, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
-        self.learning_rate_grid = [0.002, 0.003, 0.004, 0.005, 0.006, 0.007, 0.008, 0.009, 0.01]
+        self.momentum_grid = [0.0, 0.3, 0.5, 0.8, 0.9,]
+        self.learning_rate_grid = [0.0001, 0.001, 0.01, 0.1, 1, 10]
         self.activation_hidden_grid = list(self.activations.keys())
         # self.activation_output_grid = list(self.activations.keys())
         self.grid_search = GridSearch(self)
@@ -75,8 +75,14 @@ class Solution():
     def create_model(self, input_size, output_size):
         return SolutionModel(input_size, output_size, self)
 
+    def get_key(self):
+        return "{}_{}_{}_{}_{}_{}_{}".format(self.learning_rate, self.momentum, self.hidden_size, self.activation_hidden, self.activation_output, self.do_batch_norm, "{0:03d}".format(self.layers_number));
+
     # Return number of steps used
     def train_model(self, model, train_data, train_target, context):
+        key = self.get_key()
+        if key in self.sols and self.sols[key] == -1:
+            return
         step = 0
         # Put model in train mode
         model.train()
@@ -98,21 +104,31 @@ class Solution():
             correct = predict.eq(target.view_as(predict)).long().sum().item()
             # Total number of needed predictions
             total = predict.view(-1).size(0)
+            if correct == total or time_left < 0.1 or (self.grid_search.enabled and step > 100):
+                if not key in self.sols:
+                    loss = model.calc_loss(output, target)
+                    self.sols[key] = 0
+                    self.solsSum[key] = 0
+                    self.sols[key] += 1
+                    self.solsSum[key] += step
+                    self.print_stats(step, loss, correct, total, model)
+                    print('{:.4f}'.format(float(self.solsSum[key])/self.sols[key]))
+                break
             # calculate loss
             loss = model.calc_loss(output, target)
             # calculate deriviative of model.forward() and put it in model.parameters()...gradient
             loss.backward()
             # print progress of the learning
-            self.print_stats(step, loss, correct, total)
             # update model: model.parameters() -= lr * gradient
             optimizer.step()
             step += 1
         return step
     
-    def print_stats(self, step, loss, correct, total):
-        if step % 100 == 0:
-            print("Step = {} Prediction = {}/{} Error = {}".format(step, correct, total, loss.item()))
+    def print_stats(self, step, loss, correct, total, model):
+        print("LR={}, HS={}, ActivHidden={}, ActivOut={}, Step = {} Prediction = {}/{} Error = {}".format(model.lr,
+                                                                                                              model.hidden_size, model.activation_hidden, model.activation_output, step, correct, total, loss.item()))
 
+      
 ###
 ###
 ### Don't change code after this line
