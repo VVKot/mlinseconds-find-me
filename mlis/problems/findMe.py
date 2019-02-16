@@ -125,8 +125,8 @@ class Solution():
         return step
     
     def print_stats(self, step, loss, correct, total, model):
-        print("LR={}, HS={}, ActivHidden={}, ActivOut={}, Step = {} Prediction = {}/{} Error = {}".format(model.lr,
-                                                                                                              model.hidden_size, model.activation_hidden, model.activation_output, step, correct, total, loss.item()))
+        print("LR={}, Momentum={}, HS={}, Number of layers={}, ActivOut={}, Step = {} Prediction = {}/{} Error = {}".format(model.learning_rate, model.momentum,
+                                                                                                              model.hidden_size, model.activation_hidden, model.layers_number, step, correct, total, loss.item()))
 
       
 ###
